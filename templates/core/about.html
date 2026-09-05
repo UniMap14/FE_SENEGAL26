@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}À propos de nous — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">À propos</span>
+        <h1>Nos <span class="accent">missions</span></h1>
+        <p class="lead">{{ about.intro }}</p>
+    </div>
+</section>
+
+<section class="page-with-sidebar" style="display:block;">
+    <div class="content-area" style="max-width: 900px;">
+        {% if about.photo %}
+            <img src="{{ about.photo.url }}" alt="À propos" style="width:100%; border-radius:10px; margin-bottom:30px;">
+        {% endif %}
+
+        <p><strong>{{ about.long_term_goal }}</strong></p>
+
+        <div class="card-grid" style="padding:0; grid-template-columns:repeat(auto-fit, minmax(240px,1fr));">
+            {% for mission in missions %}
+                <div class="card">
+                    <div class="card-icon">{{ forloop.counter }}</div>
+                    <p style="margin:0;">{{ mission.text }}</p>
+                </div>
+            {% empty %}
+                <p>Les missions seront bientôt détaillées.</p>
+            {% endfor %}
+        </div>
+
+        {% if about.programme_summary %}
+            <p style="margin-top:30px;"><em>{{ about.programme_summary }}</em></p>
+        {% endif %}
+
+        <hr style="margin:50px 0; border:none; border-top:1px solid #e2e6ee;">
+
+        <h2 style="color:var(--navy);">Nos valeurs</h2>
+        <div class="card-grid" style="padding:0; grid-template-columns:repeat(auto-fit, minmax(220px,1fr));">
+            <div class="card">
+                <div class="card-icon">🔬</div>
+                <h4 style="margin:8px 0 6px;">Rigueur scientifique</h4>
+                <p style="margin:0;">Des méthodes de modélisation validées et une lecture critique systématique de la littérature.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🤝</div>
+                <h4 style="margin:8px 0 6px;">Collaboration</h4>
+                <p style="margin:0;">Un travail en réseau avec les programmes nationaux de lutte contre le paludisme et nos partenaires internationaux.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🎯</div>
+                <h4 style="margin:8px 0 6px;">Impact concret</h4>
+                <p style="margin:0;">Des modèles pensés pour éclairer des décisions réelles de santé publique, pas seulement pour la recherche académique.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">📚</div>
+                <h4 style="margin:8px 0 6px;">Transmission</h4>
+                <p style="margin:0;">Former une nouvelle génération de modélisateurs capables, à leur tour, de former d'autres scientifiques.</p>
+            </div>
+        </div>
+
+        <hr style="margin:50px 0; border:none; border-top:1px solid #e2e6ee;">
+
+        <h2 style="color:var(--navy);">FE_SENEGAL en chiffres</h2>
+        <div class="card-grid" style="padding:0; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); text-align:center;">
+            <div class="card">
+                <div style="font-size:2.2rem; font-weight:800; color:var(--orange);">{{ stats.guides }}</div>
+                <p style="margin:6px 0 0;">Guides pratiques EMOD</p>
+            </div>
+            <div class="card">
+                <div style="font-size:2.2rem; font-weight:800; color:var(--orange);">{{ stats.resources }}</div>
+                <p style="margin:6px 0 0;">Ressources partagées</p>
+            </div>
+            <div class="card">
+                <div style="font-size:2.2rem; font-weight:800; color:var(--orange);">{{ stats.events }}</div>
+                <p style="margin:6px 0 0;">Événements organisés</p>
+            </div>
+            <div class="card">
+                <div style="font-size:2.2rem; font-weight:800; color:var(--orange);">18</div>
+                <p style="margin:6px 0 0;">Semaines de formation intensive</p>
+            </div>
+        </div>
+
+        <div style="margin-top:40px; text-align:center;">
+            <p>Envie de voir notre communauté en action ?</p>
+            <a href="{% url 'core:gallery' %}" class="btn">Découvrir la galerie photo</a>
+            <a href="{% url 'core:team_list' %}" class="btn-outline">Rencontrer l'équipe</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

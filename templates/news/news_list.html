@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Actualités — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">Actualités</span>
+        <h1>Nos <span class="accent">actualités</span></h1>
+        <p class="lead">Annonces, comptes-rendus d'événements et actualités du programme {{ site_settings.site_name }}.</p>
+    </div>
+</section>
+
+<section style="padding: 50px 40px;">
+
+    <div class="filter-tabs">
+        <a href="{% url 'news:index' %}" class="btn-outline{% if not active_category %} active{% endif %}">Toutes</a>
+        {% for key, label in categories %}
+            <a href="{% url 'news:index' %}?categorie={{ key }}" class="btn-outline{% if active_category == key %} active{% endif %}">{{ label }}</a>
+        {% endfor %}
+    </div>
+
+    {% if featured %}
+        <a href="{{ featured.get_absolute_url }}" class="news-featured">
+            <div class="news-featured-image">
+                {% if featured.cover_image %}
+                    <img src="{{ featured.cover_image.url }}" alt="{{ featured.title }}">
+                {% else %}
+                    <img src="{% static 'img/hero-bg.jpg' %}" alt="{{ featured.title }}">
+                {% endif %}
+            </div>
+            <div class="news-featured-body">
+                <span class="eyebrow-pill" style="background:rgba(232,150,30,0.12); color:var(--orange); border-color:rgba(232,150,30,0.4);">À la une · {{ featured.get_category_display }}</span>
+                <h2>{{ featured.title }}</h2>
+                <p>{{ featured.display_excerpt }}</p>
+                <span class="news-date">{{ featured.published_date|date:"d F Y" }} · {{ featured.reading_time_minutes }} min de lecture</span>
+            </div>
+        </a>
+    {% endif %}
+
+    <div class="news-grid">
+        {% for article in articles %}
+            <a href="{{ article.get_absolute_url }}" class="news-card">
+                <div class="news-card-image">
+                    {% if article.cover_image %}
+                        <img src="{{ article.cover_image.url }}" alt="{{ article.title }}">
+                    {% else %}
+                        <img src="{% static 'img/hero-bg.jpg' %}" alt="{{ article.title }}">
+                    {% endif %}
+                    <span class="news-card-category">{{ article.get_category_display }}</span>
+                </div>
+                <div class="news-card-body">
+                    <span class="news-date">{{ article.published_date|date:"d F Y" }} · {{ article.reading_time_minutes }} min</span>
+                    <h3>{{ article.title }}</h3>
+                    <p>{{ article.display_excerpt }}</p>
+                    <span class="card-link">Lire la suite →</span>
+                </div>
+            </a>
+        {% empty %}
+            <p>Aucune actualité pour l'instant.</p>
+        {% endfor %}
+    </div>
+
+    {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

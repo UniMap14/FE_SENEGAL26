@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load social_extras %}
+{% block title %}{{ member.name }} — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-with-sidebar" style="display:block; padding-top:40px;">
+    <div class="content-area" style="max-width: 980px;">
+        <p style="color:var(--text-muted); font-size:0.9rem;">
+            <a href="{% url 'core:team_list' %}" style="color:inherit;">Équipe</a> &nbsp;›&nbsp; {{ member.name }}
+        </p>
+
+        <div class="profile-header-v2">
+            <div class="profile-photo-rect">
+                {% if member.photo %}
+                    <img src="{{ member.photo.url }}" alt="{{ member.name }}">
+                {% else %}
+                    <div class="team-avatar" style="width:100%; height:100%; font-size:3rem;">{{ member.initials }}</div>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h1 style="margin-bottom:4px;">{{ member.name }}</h1>
+                <p style="color:var(--orange); font-weight:700; margin:0 0 16px;">{{ member.role }}</p>
+
+                {% if member.bio %}
+                    <div class="article-body">{{ member.bio|linebreaks }}</div>
+                {% endif %}
+
+                {% if member.email %}
+                    <p style="margin-top:10px;"><a href="mailto:{{ member.email }}" class="card-link">✉️ {{ member.email }}</a></p>
+                {% endif %}
+
+                {% if member.social_links %}
+                    <div class="social-icons social-icons--light" style="margin-top:18px;">
+                        {% for label, url, kind in member.social_links %}
+                            <a href="{{ url }}" target="_blank" rel="noopener" title="{{ label }}" style="--brand-color: {{ kind|brand_color }};">{{ kind|social_svg }}</a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{% url 'core:team_list' %}" class="btn-outline" style="margin-top:30px;">← Retour à l'équipe</a>
+    </div>
+</section>
+
+{% if others %}
+<section style="padding: 10px 40px 60px; max-width:1150px; margin:0 auto;">
+    <h2 style="color:var(--navy);">Autres membres</h2>
+    <div class="team-grid">
+        {% for other in others %}
+            <a href="{{ other.get_absolute_url }}" class="team-card">
+                {% if other.photo %}
+                    <div class="team-card-photo"><img src="{{ other.photo.url }}" alt="{{ other.name }}"></div>
+                {% else %}
+                    <div class="team-card-photo team-avatar">{{ other.initials }}</div>
+                {% endif %}
+                <h3 class="team-card-name">{{ other.name }}</h3>
+                <p class="team-card-role">{{ other.role }}</p>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

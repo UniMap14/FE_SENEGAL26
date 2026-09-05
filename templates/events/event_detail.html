@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">{% if event.is_past %}Événement passé{% else %}Événement à venir{% endif %}</span>
+        <h1>{{ event.title }}</h1>
+        <p class="lead">
+            {{ event.start_datetime|date:"d F Y, H:i" }}{% if event.end_datetime %} — {{ event.end_datetime|date:"d F Y, H:i" }}{% endif %}
+            {% if event.location %} · {{ event.location }}{% endif %}
+        </p>
+    </div>
+</section>
+
+<article style="max-width: 800px; margin: 0 auto; padding: 50px 40px;">
+    <p><a href="{% url 'events:event_list' %}">← Tous les événements</a></p>
+
+    {% if event.image %}
+        <img src="{{ event.image.url }}" alt="{{ event.title }}" style="width:100%; border-radius:10px; margin: 20px 0;">
+    {% endif %}
+
+    <div class="article-body">{{ event.description|linebreaks }}</div>
+
+    {% if event.registration_url and not event.is_past %}
+        <a href="{{ event.registration_url }}" class="btn" target="_blank" rel="noopener">S'inscrire</a>
+    {% endif %}
+
+    {% if event.photos.all %}
+        <h2 id="galerie" style="color:var(--navy); margin-top:50px; scroll-margin-top: 100px;">Galerie photo</h2>
+        <div class="gallery-grid">
+            {% for photo in event.photos.all %}
+                <a href="#photo-{{ photo.id }}" class="gallery-thumb">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:event.title }}">
+                </a>
+            {% endfor %}
+        </div>
+
+        {% for photo in event.photos.all %}
+            <div id="photo-{{ photo.id }}" class="lightbox">
+                <a href="#_" class="lightbox-overlay" aria-label="Fermer"></a>
+                <figure class="lightbox-content">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:event.title }}">
+                    {% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}
+                    <a href="#_" class="lightbox-close" aria-label="Fermer">✕</a>
+                </figure>
+            </div>
+        {% endfor %}
+    {% endif %}
+</article>
+{% endblock %}

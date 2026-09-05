@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ site_settings.site_name }} — {{ site_settings.tagline }}{% endblock %}
+
+{% block content %}
+{% with slide=slides.first %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">{{ site_settings.site_name }}</span>
+        <h1>{% if slide %}{{ slide.title }}{% else %}Former l'excellence en <span class="accent">modélisation appliquée</span> du paludisme{% endif %}</h1>
+        <p class="lead">
+            {% if slide %}{{ slide.body }}{% else %}{{ about.intro }}{% endif %}
+        </p>
+        <a href="{% if slide and slide.button_url %}{{ slide.button_url }}{% else %}{% url 'core:about' %}{% endif %}" class="btn">
+            {% if slide %}{{ slide.button_text }}{% else %}En savoir plus{% endif %}
+        </a>
+    </div>
+</section>
+{% endwith %}
+
+<section class="feature-strip">
+    <div class="feature-item">
+        <div class="feature-icon">🎓</div>
+        <div><h4>Programme intensif</h4><p>{{ about.programme_summary|truncatewords:18 }}</p></div>
+    </div>
+    <div class="feature-item">
+        <div class="feature-icon">🌍</div>
+        <div><h4>Ancrage régional</h4><p>Un réseau de scientifiques connectés à travers l'Afrique et à l'international.</p></div>
+    </div>
+    <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div><h4>Décisions fondées sur les données</h4><p>Une modélisation au service de la lutte contre le paludisme.</p></div>
+    </div>
+</section>
+
+<section class="page-with-sidebar" style="display:block; padding-top:0;">
+    <div class="content-area" style="max-width: 900px;">
+        <h1>Nos missions</h1>
+        <div class="card-grid" style="padding:0; grid-template-columns:repeat(auto-fit, minmax(240px,1fr));">
+            {% for mission in missions %}
+                <div class="card">
+                    <div class="card-icon">{{ forloop.counter }}</div>
+                    <p style="margin:0;">{{ mission.text }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <a href="{% url 'core:about' %}" class="btn-outline">Découvrir toute notre mission →</a>
+    </div>
+</section>
+{% endblock %}

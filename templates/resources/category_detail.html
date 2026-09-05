@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load resource_extras %}
+{% block title %}{{ category.title }} — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">Ressources</span>
+        <h1>{{ category.title }}</h1>
+        <p class="lead">Toutes les ressources disponibles dans cette catégorie.</p>
+    </div>
+</section>
+
+<section class="page-with-sidebar">
+    <aside class="sidebar">
+        <div class="sidebar-title">📁 Ressources supplémentaires</div>
+        {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}" class="{% if cat == category %}active{% endif %}">{{ cat.title }}</a>
+        {% endfor %}
+    </aside>
+    <div class="content-area">
+        <h1>{{ category.title }}</h1>
+        <div class="card-grid" style="padding:0;">
+            {% for res in resources %}
+                <div class="card">
+                    <span class="card-badge">{{ res.resource_type|resource_icon }} {{ res.get_resource_type_display }} · {{ res.get_level_display }}</span>
+                    <h3>{{ res.title }}</h3>
+                    <p>{{ res.description }}</p>
+                    {% if res.external_url %}
+                        <a href="{{ res.external_url }}" target="_blank" rel="noopener" class="card-link">Voir la ressource →</a>
+                    {% elif res.file %}
+                        <a href="{{ res.file.url }}" class="card-link">Télécharger →</a>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>Aucune ressource pour l'instant.</p>
+            {% endfor %}
+        </div>
+        {% include "partials/pagination.html" %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Notre équipe — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">Équipe</span>
+        <h1>Les membres de <span class="accent">{{ site_settings.site_name }}</span></h1>
+        <p class="lead">Coordination, enseignants-chercheurs, étudiants et partenaires qui font vivre le programme. {{ total_count }} membre{{ total_count|pluralize }}.</p>
+    </div>
+</section>
+
+<section class="page-with-sidebar" style="display:block;">
+    <div class="content-area" style="max-width: 1150px;">
+
+        <div class="filter-tabs">
+            <a href="{% url 'core:team_list' %}" class="btn-outline{% if not active_category %} active{% endif %}">Tous</a>
+            {% for key, label in categories %}
+                <a href="{% url 'core:team_list' %}?categorie={{ key }}" class="btn-outline{% if active_category == key %} active{% endif %}">{{ label }}</a>
+            {% endfor %}
+        </div>
+
+        <div class="team-grid">
+            {% for member in members %}
+                <a href="{{ member.get_absolute_url }}" class="team-card">
+                    {% if member.photo %}
+                        <div class="team-card-photo"><img src="{{ member.photo.url }}" alt="{{ member.name }}"></div>
+                    {% else %}
+                        <div class="team-card-photo team-avatar">{{ member.initials }}</div>
+                    {% endif %}
+                    <h3 class="team-card-name">{{ member.name }}</h3>
+                    <p class="team-card-role">{{ member.role }}</p>
+                </a>
+            {% empty %}
+                <p>Aucun membre pour l'instant.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

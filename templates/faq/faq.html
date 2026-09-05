@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}FAQ — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">FAQ</span>
+        <h1>Questions <span class="accent">fréquentes</span></h1>
+        <p class="lead">Retrouve ici les réponses aux questions les plus posées sur {{ site_settings.site_name }}, le programme et EMOD. Une autre question ? <a href="{% url 'contact:contact' %}" style="color:#fff; text-decoration:underline;">Contacte-nous</a>.</p>
+    </div>
+</section>
+
+<section style="padding: 50px 40px; max-width: 900px; margin: 0 auto;">
+    {% regroup items by topic as topic_list %}
+    {% for topic_group in topic_list %}
+        <h2 class="faq-topic">{{ topic_group.grouper|default:"Général" }}</h2>
+        <div class="faq-list">
+            {% for item in topic_group.list %}
+                <details class="faq-item">
+                    <summary>{{ item.question }}</summary>
+                    <div class="faq-answer">{{ item.answer|linebreaks }}</div>
+                </details>
+            {% endfor %}
+        </div>
+    {% empty %}
+        <p>Aucune question pour l'instant.</p>
+    {% endfor %}
+</section>
+{% endblock %}

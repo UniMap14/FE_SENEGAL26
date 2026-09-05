@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ category.title }} — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">EMOD</span>
+        <h1>{{ category.title }}</h1>
+        {% if category.intro_text %}<p class="lead">{{ category.intro_text }}</p>{% endif %}
+    </div>
+</section>
+<section class="page-with-sidebar">
+    <aside class="sidebar">
+        <div class="sidebar-title">📘 Guides pratiques EMOD</div>
+        {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}" class="{% if cat == category %}active{% endif %}">{{ cat.title }}</a>
+        {% endfor %}
+    </aside>
+    <div class="content-area">
+        <p style="color:var(--text-muted); margin-top:0;">{{ category.guides.count }} guide{{ category.guides.count|pluralize }} dans cette catégorie</p>
+        <div class="guide-list">
+            {% for guide in guides %}
+                <a href="{{ guide.get_absolute_url }}" class="guide-list-item">
+                    <span class="guide-list-number">{{ forloop.counter0|add:page_obj.start_index }}</span>
+                    <span class="guide-list-body">
+                        <span class="guide-list-title">{{ guide.title }}</span>
+                        <span class="guide-list-meta">⏱️ {{ guide.reading_time_minutes }} min de lecture{% if guide.file %} · 📎 fichier joint{% endif %}</span>
+                    </span>
+                    <span class="guide-list-arrow">→</span>
+                </a>
+            {% empty %}
+                <p>Aucun guide pour l'instant.</p>
+            {% endfor %}
+        </div>
+        {% include "partials/pagination.html" %}
+    </div>
+</section>
+{% endblock %}

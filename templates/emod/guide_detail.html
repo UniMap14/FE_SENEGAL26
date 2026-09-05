@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ guide.title }} — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-with-sidebar">
+    <aside class="sidebar">
+        <h3>Guides pratiques EMOD</h3>
+        {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}" class="{% if cat == category %}active{% endif %}">{{ cat.title }}</a>
+        {% endfor %}
+    </aside>
+    <div class="content-area">
+        <p style="color:var(--text-muted); font-size:0.9rem;">
+            <a href="{% url 'emod:index' %}" style="color:inherit;">EMOD</a>
+            &nbsp;›&nbsp;
+            <a href="{{ category.get_absolute_url }}" style="color:inherit;">{{ category.title }}</a>
+            &nbsp;›&nbsp; Guide {{ position }}/{{ total_in_category }}
+        </p>
+        <h1>{{ guide.title }}</h1>
+        <p style="color:var(--text-muted); margin-top:-10px;">⏱️ {{ guide.reading_time_minutes }} min de lecture</p>
+
+        {% if guide.content %}
+            <div class="guide-content">{{ guide.content|linebreaks }}</div>
+        {% endif %}
+        {% if guide.file %}
+            <p><a href="{{ guide.file.url }}" class="btn">Télécharger le document</a></p>
+        {% endif %}
+
+        <div class="guide-nav">
+            {% if prev_guide %}
+                <a href="{{ prev_guide.get_absolute_url }}" class="guide-nav-link prev">
+                    <span class="guide-nav-label">← Guide précédent</span>
+                    <span class="guide-nav-title">{{ prev_guide.title }}</span>
+                </a>
+            {% endif %}
+            {% if next_guide %}
+                <a href="{{ next_guide.get_absolute_url }}" class="guide-nav-link next">
+                    <span class="guide-nav-label">Guide suivant →</span>
+                    <span class="guide-nav-title">{{ next_guide.title }}</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

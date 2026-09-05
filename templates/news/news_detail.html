@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ article.title }} — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">{{ article.get_category_display }}</span>
+        <h1>{{ article.title }}</h1>
+        <p class="lead">Publié le {{ article.published_date|date:"d F Y" }} · {{ article.reading_time_minutes }} min de lecture</p>
+    </div>
+</section>
+
+<article style="max-width: 780px; margin: 0 auto; padding: 50px 40px;">
+    {% if article.cover_image %}
+        <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" style="width:100%; border-radius:10px; margin-bottom:30px;">
+    {% else %}
+        <img src="{% static 'img/hero-bg.jpg' %}" alt="{{ article.title }}" style="width:100%; border-radius:10px; margin-bottom:30px;">
+    {% endif %}
+
+    <div class="article-body">
+        {{ article.content|linebreaks }}
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-top:20px;">
+        <a href="{% url 'news:index' %}" class="btn-outline" style="margin-top:0;">← Retour aux actualités</a>
+        <button type="button" class="btn-outline" style="margin-top:0;" onclick="navigator.clipboard.writeText(window.location.href); this.textContent='Lien copié ✓';">🔗 Partager cet article</button>
+    </div>
+</article>
+
+{% if other_articles %}
+<section style="padding: 20px 40px 60px;">
+    <h2 style="color:var(--navy); margin-bottom:20px;">À lire aussi</h2>
+    <div class="news-grid">
+        {% for other in other_articles %}
+            <a href="{{ other.get_absolute_url }}" class="news-card">
+                <div class="news-card-image">
+                    {% if other.cover_image %}
+                        <img src="{{ other.cover_image.url }}" alt="{{ other.title }}">
+                    {% else %}
+                        <img src="{% static 'img/hero-bg.jpg' %}" alt="{{ other.title }}">
+                    {% endif %}
+                </div>
+                <div class="news-card-body">
+                    <span class="news-date">{{ other.published_date|date:"d F Y" }}</span>
+                    <h3>{{ other.title }}</h3>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

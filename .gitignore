@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+.DS_Store
+.vscode/
+.idea/
+.env
+
+# Remarque : db.sqlite3 et media/ sont volontairement suivis par Git dans ce
+# projet (petit site solo) pour que "git clone" reproduise immédiatement le
+# site avec tout son contenu réel (logo, photos, profils). Si vous passez un
+# jour à une vraie base de production (PostgreSQL, etc.), retirez db.sqlite3
+# de Git et ajoutez-le ici.

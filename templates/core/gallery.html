@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Galerie — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="hero-slide active" style="background-image:url('{% static "img/hero-slides/hero-01.jpg" %}');"></div>
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">Galerie</span>
+        <h1>La vie de <span class="accent">{{ site_settings.site_name }}</span> en images</h1>
+        <p class="lead">Ateliers, séminaires, séances de travail et moments de vie du programme : {{ photos|length }} photo{{ photos|length|pluralize }} à découvrir.</p>
+    </div>
+</section>
+
+<section class="page-with-sidebar" style="display:block;">
+    <div class="content-area" style="max-width: 1150px;">
+
+        <div class="filter-tabs">
+            <a href="{% url 'core:gallery' %}" class="btn-outline{% if not active_category %} active{% endif %}">
+                Toutes les photos <span class="filter-count">{{ total_count }}</span>
+            </a>
+            {% for cat in categories %}
+                {% if cat.count %}
+                    <a href="{% url 'core:gallery' %}?categorie={{ cat.key }}" class="btn-outline{% if active_category == cat.key %} active{% endif %}">
+                        {{ cat.label }} <span class="filter-count">{{ cat.count }}</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if photos %}
+            <div class="gallery-grid gallery-grid--rich">
+                {% for photo in photos %}
+                    <a href="#photo-{{ photo.id }}" class="gallery-thumb">
+                        <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:"Photo de la galerie" }}" loading="lazy">
+                        {% if photo.caption %}<span class="gallery-thumb-caption">{{ photo.caption }}</span>{% endif %}
+                    </a>
+                {% endfor %}
+            </div>
+
+            {% for photo in photos %}
+                <div id="photo-{{ photo.id }}" class="lightbox">
+                    <a href="#_" class="lightbox-overlay" aria-label="Fermer"></a>
+                    <figure class="lightbox-content">
+                        <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:"Photo de la galerie" }}">
+                        {% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}
+                        <a href="#_" class="lightbox-close" aria-label="Fermer">✕</a>
+                        {% if photo.prev_id %}<a href="#photo-{{ photo.prev_id }}" class="lightbox-nav prev" aria-label="Photo précédente">‹</a>{% endif %}
+                        {% if photo.next_id %}<a href="#photo-{{ photo.next_id }}" class="lightbox-nav next" aria-label="Photo suivante">›</a>{% endif %}
+                    </figure>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Aucune photo dans cette catégorie pour le moment.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

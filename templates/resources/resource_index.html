@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load resource_extras %}
+{% block title %}Ressources — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">Ressources</span>
+        <h1>Aperçu des <span class="accent">ressources</span></h1>
+        <p class="lead">Cette section fournit des ressources supplémentaires accompagnant le matériel de
+            cours dans <code>Lessons</code> et <code>Modules</code>.</p>
+    </div>
+</section>
+
+<section class="page-with-sidebar">
+    <aside class="sidebar">
+        <div class="sidebar-title">📁 Ressources supplémentaires</div>
+        {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}">{{ cat.title }}</a>
+        {% endfor %}
+    </aside>
+
+    <div class="content-area">
+        <form method="get" class="toolbar">
+            <input type="search" name="q" value="{{ query }}" placeholder="Rechercher une ressource...">
+            <select name="type">
+                <option value="">Type</option>
+                {% for value, label in type_choices %}
+                    <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <select name="level">
+                <option value="">Niveau</option>
+                {% for value, label in level_choices %}
+                    <option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn" style="margin-top:0;">Rechercher</button>
+            {% if is_search %}
+                <a href="{% url 'resources:index' %}" class="btn-outline" style="margin-top:0; padding:11px 20px;">Réinitialiser</a>
+            {% endif %}
+        </form>
+
+        {% if is_search %}
+            <p style="color:var(--text-muted); margin-bottom:20px;">
+                {{ results|length }} résultat{{ results|length|pluralize }} trouvé{{ results|length|pluralize }}
+                {% if query %}pour « {{ query }} »{% endif %}
+            </p>
+            <div class="card-grid" style="padding:0;">
+                {% for res in results %}
+                    <div class="card">
+                        <span class="card-badge">{{ res.resource_type|resource_icon }} {{ res.get_resource_type_display }} · {{ res.get_level_display }}</span>
+                        <h3>{{ res.title }}</h3>
+                        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:4px;">{{ res.category.title }}</p>
+                        <p>{{ res.description }}</p>
+                        {% if res.external_url %}
+                            <a href="{{ res.external_url }}" target="_blank" rel="noopener" class="card-link">Voir la ressource →</a>
+                        {% elif res.file %}
+                            <a href="{{ res.file.url }}" class="card-link">Télécharger →</a>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p>Aucune ressource ne correspond à ta recherche.</p>
+                {% endfor %}
+            
+            </div>
+            {% include "partials/pagination.html" %}
+        {% else %}
+            <p style="color:var(--text-muted); margin-bottom:10px;">{{ total_resources }} ressources réparties en {{ categories|length }} catégories.</p>
+            <div class="card-grid" style="padding:0; grid-template-columns:repeat(auto-fit, minmax(220px,1fr));">
+                {% for cat in categories %}
+                    <div class="card">
+                        <div class="card-icon">📁</div>
+                        <h3>{{ cat.title }}</h3>
+                        <p>{{ cat.resources.count }} ressource{{ cat.resources.count|pluralize }}</p>
+                        <a href="{{ cat.get_absolute_url }}" class="card-link">Voir les ressources →</a>
+                    </div>
+                {% empty %}
+                    <p>Aucune catégorie pour l'instant.</p>
+                {% endfor %}
+            </div>
+
+            {% if recent_resources %}
+                <h2 style="color:var(--navy); margin-top:44px;">Ajoutées récemment</h2>
+                <div class="featured-resource-strip">
+                    {% for res in recent_resources %}
+                        <div class="card">
+                            <span class="card-badge">{{ res.resource_type|resource_icon }} {{ res.get_resource_type_display }}</span>
+                            <h3 style="font-size:1.05rem;">{{ res.title }}</h3>
+                            <p style="color:var(--text-muted); font-size:0.85rem;">{{ res.category.title }}</p>
+                            {% if res.external_url %}
+                                <a href="{{ res.external_url }}" target="_blank" rel="noopener" class="card-link">Voir →</a>
+                            {% elif res.file %}
+                                <a href="{{ res.file.url }}" class="card-link">Télécharger →</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</section>
+
+<div class="feature-strip">
+    <div class="feature-item">
+        <div class="feature-icon">🛡️</div>
+        <div><h4>Contenu de qualité</h4><p>Des ressources vérifiées et mises à jour régulièrement par nos experts.</p></div>
+    </div>
+    <div class="feature-item">
+        <div class="feature-icon">🕐</div>
+        <div><h4>Accès 24/7</h4><p>Accédez à vos ressources à tout moment et depuis n'importe où.</p></div>
+    </div>
+    <div class="feature-item">
+        <div class="feature-icon">💻</div>
+        <div><h4>Multi-supports</h4><p>Disponible sur tous vos appareils pour un apprentissage flexible.</p></div>
+    </div>
+    <div class="feature-item">
+        <div class="feature-icon">👥</div>
+        <div><h4>Communauté</h4><p>Rejoignez une communauté d'apprenants et échangez vos connaissances.</p></div>
+    </div>
+</div>
+{% endblock %}

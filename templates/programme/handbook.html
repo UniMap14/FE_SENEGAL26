@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Manuel du programme — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">Programme</span>
+        <h1>{{ programme_year.intro_title|default:"Manuel du programme" }}</h1>
+        <p class="lead">{{ programme_year.intro_subtitle }}</p>
+    </div>
+</section>
+<section class="page-with-sidebar">
+    <aside class="sidebar">
+        <div class="sidebar-title">🗓️ {{ programme_year.year_label }}</div>
+        {% for section in sections %}
+            <a href="{{ section.url|default:'#' }}">{{ section.title }}</a>
+        {% endfor %}
+    </aside>
+
+    <div class="content-area">
+        {% if programme_year.handbook_file %}
+            <p><a href="{{ programme_year.handbook_file.url }}" class="btn">Manuel complet du programme</a></p>
+        {% endif %}
+
+        {% if programme_year.objectives_and_expectations %}
+            <h2>Attentes générales</h2>
+            <p>{{ programme_year.objectives_and_expectations }}</p>
+        {% endif %}
+
+        {% if programme_year.journal_club_expectations %}
+            <h2>Club de lecture</h2>
+            <p>{{ programme_year.journal_club_expectations }}</p>
+        {% endif %}
+
+        {% if programme_year.presentation_expectations %}
+            <h2>Présentations de projet</h2>
+            <p>{{ programme_year.presentation_expectations }}</p>
+        {% endif %}
+
+        <h2>Étapes clés du programme</h2>
+        <table class="styled">
+            <thead>
+                <tr><th>Semaine</th><th>Jalon</th><th>Exigible</th></tr>
+            </thead>
+            <tbody>
+                {% for m in milestones %}
+                <tr>
+                    <td>{{ m.week }}</td>
+                    <td>{{ m.task }}</td>
+                    <td>{{ m.due_date|date:"d F Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3">Aucun jalon renseigné pour l'instant.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Guide pratique EMOD — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    {% include "partials/hero_slider.html" %}
+    <div class="page-hero-inner">
+        <span class="eyebrow-pill">EMOD</span>
+        <h1>Guides pratiques <span class="accent">EMOD</span></h1>
+        <p class="lead">Cliquez sur une catégorie pour accéder aux guides d'installation, de simulation et d'analyse du modèle EMOD.</p>
+    </div>
+</section>
+<section class="page-with-sidebar">
+    <aside class="sidebar">
+        <div class="sidebar-title">📘 Guides pratiques EMOD</div>
+        {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}">{{ cat.title }}</a>
+        {% endfor %}
+    </aside>
+    <div class="content-area">
+        <div class="card" style="margin-bottom:30px; background:#f3f6fb;">
+            <h3 style="margin-top:0; color:var(--navy);">Qu'est-ce qu'EMOD ?</h3>
+            <p style="margin-bottom:0;">
+                EMOD (<em>Epidemiological MODeling</em>) est un logiciel open-source de modélisation de maladies
+                développé par l'Institute for Disease Modeling. Il permet de simuler la transmission du paludisme
+                à l'échelle d'une population en tenant compte des vecteurs, du climat, des interventions de lutte
+                (moustiquaires, pulvérisation, traitement) et des caractéristiques démographiques locales. Les guides
+                ci-dessous vous accompagnent pas à pas, de l'installation du logiciel jusqu'à l'analyse des résultats
+                de simulation.
+            </p>
+        </div>
+
+        <form method="get" class="toolbar" style="margin-bottom:26px;">
+            <input type="search" name="q" value="{{ query }}" placeholder="Rechercher un guide EMOD (ex: installation, calibration...)">
+            <button type="submit" class="btn" style="margin-top:0;">Rechercher</button>
+            {% if query %}
+                <a href="{% url 'emod:index' %}" class="btn-outline" style="margin-top:0; padding:11px 20px;">Réinitialiser</a>
+            {% endif %}
+        </form>
+
+        {% if query %}
+            <p style="color:var(--text-muted); margin-bottom:20px;">
+                {{ search_results|length }} guide{{ search_results|length|pluralize }} trouvé{{ search_results|length|pluralize }} pour « {{ query }} »
+            </p>
+            <div class="card-grid" style="padding:0;">
+                {% for guide in search_results %}
+                    <div class="card">
+                        <span class="card-badge">{{ guide.category.title }} · {{ guide.reading_time_minutes }} min de lecture</span>
+                        <h3><a href="{{ guide.get_absolute_url }}" style="color:inherit; text-decoration:none;">{{ guide.title }}</a></h3>
+                        {% if guide.content %}<p>{{ guide.content|truncatewords:22 }}</p>{% endif %}
+                        <a href="{{ guide.get_absolute_url }}" class="card-link">Lire le guide →</a>
+                    </div>
+                {% empty %}
+                    <p>Aucun guide ne correspond à ta recherche.</p>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color:var(--text-muted); margin-bottom:14px;">{{ total_guides }} guides répartis en {{ categories|length }} catégories.</p>
+            <div class="card-grid" style="padding:0; grid-template-columns:repeat(auto-fit, minmax(220px,1fr));">
+                {% for cat in categories %}
+                    <div class="card">
+                        <div class="card-icon">📘</div>
+                        <h3>{{ cat.title }}</h3>
+                        <p>{{ cat.guides.count }} guide{{ cat.guides.count|pluralize }}</p>
+                        <a href="{{ cat.get_absolute_url }}" class="card-link">Voir les guides →</a>
+                    </div>
+                {% empty %}
+                    <p>Aucune catégorie pour l'instant.</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
