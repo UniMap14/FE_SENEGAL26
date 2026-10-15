@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 .venv/
+staticfiles/
+backups/
 venv/
 env/
 *.egg-info/
@@ -14,3 +16,5 @@ env/
 # site avec tout son contenu réel (logo, photos, profils). Si vous passez un
 # jour à une vraie base de production (PostgreSQL, etc.), retirez db.sqlite3
 # de Git et ajoutez-le ici.
+
+db.sqlite3

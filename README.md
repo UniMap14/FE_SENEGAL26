@@ -71,12 +71,42 @@ membres de l'équipe, galerie, réglages de contact) se gère depuis `/admin/` �
 aucune modification de code n'est nécessaire pour mettre à jour le site au
 quotidien.
 
+## Sauvegardes
+
+Le site stocke tout son contenu dans `db.sqlite3` (profils, actualités, messages) et le
+dossier `media/` (photos, logos). Une commande crée une archive `.zip` datée des deux :
+
+```
+python manage.py backup_site                          # -> dossier backups/
+python manage.py backup_site --output D:\Sauvegardes --keep 30
+python manage.py backup_site --no-media               # base de données seulement
+```
+
+- La copie de la base est cohérente même si le site est en ligne.
+- Les archives les plus anciennes sont supprimées au-delà de `--keep` (14 par défaut).
+- Le dossier `backups/` n'est pas suivi par Git (il contient des données personnelles).
+- **Copiez régulièrement les archives ailleurs que sur le serveur** (autre disque, cloud, autre machine) : une sauvegarde sur le même disque ne protège pas d'une panne du serveur.
+
+**Automatiser** (une sauvegarde par nuit à 2 h) :
+
+- Linux (cron, `crontab -e`) :
+  `0 2 * * * cd /chemin/du/projet && /chemin/du/venv/bin/python manage.py backup_site`
+- Windows (Planificateur de tâches) :
+  `schtasks /Create /SC DAILY /ST 02:00 /TN "FE_SENEGAL sauvegarde" /TR "cmd /c cd /d C:\chemin\du\projet && venv\Scripts\python.exe manage.py backup_site"`
+
+**Restaurer** : arrêter le site, dézipper l'archive choisie, remplacer `db.sqlite3` et le
+dossier `media/` du projet par ceux de l'archive, puis redémarrer le site.
+
 ## Avant la mise en production
 
 - Générer une nouvelle `SECRET_KEY` et la définir via la variable d'environnement
   `DJANGO_SECRET_KEY` (ne jamais garder la clé de développement du dépôt)
 - Mettre `DJANGO_DEBUG=False`
 - Renseigner `DJANGO_ALLOWED_HOSTS` avec le(s) nom(s) de domaine réel(s)
-- Configurer un serveur de fichiers statiques/médias (ex: WhiteNoise, S3, etc.)
+- Fichiers statiques : WhiteNoise est déjà configuré. À chaque déploiement, lancer
+`python manage.py migrate` puis `python manage.py collectstatic --noinput`, puis
+redémarrer l'application (sinon l'admin s'affiche sans style).
+- Médias (logo, photos de profil, galerie) : servis par Django par défaut ; si nginx/Apache
+sert déjà `/media/`, définir `DJANGO_SERVE_MEDIA=False`
 - Utiliser une vraie base de données (PostgreSQL recommandé) plutôt que SQLite,
   et à ce moment-là retirer `db.sqlite3` du suivi Git (voir `.gitignore`)

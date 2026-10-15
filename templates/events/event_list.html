@@ -10,7 +10,7 @@
         <p class="lead">Ateliers, sessions de formation et rencontres de la communauté FE_SENEGAL.</p>
     </div>
 </section>
-<section style="padding: 40px;">
+<section style="padding: 40px;" id="liste" data-live-region>
     <h1>Événements à venir</h1>
     <div class="card-grid" style="padding:0;">
         {% for event in upcoming_events %}
@@ -40,13 +40,13 @@
     {% if upcoming_page_obj.paginator.num_pages > 1 %}
     <nav class="pagination" aria-label="Pagination événements à venir">
         {% if upcoming_page_obj.has_previous %}
-            <a href="{% querystring page_upcoming=upcoming_page_obj.previous_page_number %}" class="page-link">← Précédent</a>
+            <a href="{% querystring page_upcoming=upcoming_page_obj.previous_page_number %}#liste" class="page-link">← Précédent</a>
         {% else %}
             <span class="page-link disabled">← Précédent</span>
         {% endif %}
         <span class="page-current">Page {{ upcoming_page_obj.number }} sur {{ upcoming_page_obj.paginator.num_pages }}</span>
         {% if upcoming_page_obj.has_next %}
-            <a href="{% querystring page_upcoming=upcoming_page_obj.next_page_number %}" class="page-link">Suivant →</a>
+            <a href="{% querystring page_upcoming=upcoming_page_obj.next_page_number %}#liste" class="page-link">Suivant →</a>
         {% else %}
             <span class="page-link disabled">Suivant →</span>
         {% endif %}
@@ -76,13 +76,13 @@
         {% if past_page_obj.paginator.num_pages > 1 %}
         <nav class="pagination" aria-label="Pagination événements passés">
             {% if past_page_obj.has_previous %}
-                <a href="{% querystring page_past=past_page_obj.previous_page_number %}" class="page-link">← Précédent</a>
+                <a href="{% querystring page_past=past_page_obj.previous_page_number %}#liste" class="page-link">← Précédent</a>
             {% else %}
                 <span class="page-link disabled">← Précédent</span>
             {% endif %}
             <span class="page-current">Page {{ past_page_obj.number }} sur {{ past_page_obj.paginator.num_pages }}</span>
             {% if past_page_obj.has_next %}
-                <a href="{% querystring page_past=past_page_obj.next_page_number %}" class="page-link">Suivant →</a>
+                <a href="{% querystring page_past=past_page_obj.next_page_number %}#liste" class="page-link">Suivant →</a>
             {% else %}
                 <span class="page-link disabled">Suivant →</span>
             {% endif %}

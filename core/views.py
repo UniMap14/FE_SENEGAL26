@@ -65,9 +65,19 @@ def team_list_view(request):
     if category:
         members = members.filter(category=category)
 
+    years = list(
+        TeamMember.objects.filter(is_active=True, cohort_year__isnull=False)
+        .values_list("cohort_year", flat=True).distinct().order_by("cohort_year")
+    )
+    year = request.GET.get("promotion", "").strip()
+    if year.isdigit():
+        members = members.filter(cohort_year=int(year))
+
     context = {
         "members": members,
         "categories": TeamMember.CATEGORY_CHOICES,
+        "years": years,
+        "active_year": year,
         "active_category": category,
         "total_count": TeamMember.objects.filter(is_active=True).count(),
     }

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 import os
 
+from .hosts import trusted_origins_from_hosts
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,13 +43,26 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.environ.get(
-    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver"
-).split(",")
-
-CSRF_TRUSTED_ORIGINS = [
-    origin for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if origin
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
+    if h.strip()
 ]
+
+# Origines autorisées à envoyer des formulaires (connexion à /admin/, contact...).
+# Déduites automatiquement des domaines de DJANGO_ALLOWED_HOSTS (https://domaine) ;
+# DJANGO_CSRF_TRUSTED_ORIGINS permet d'en ajouter d'autres (ex: "http://monsite.sn").
+CSRF_TRUSTED_ORIGINS = trusted_origins_from_hosts(ALLOWED_HOSTS) + [
+    origin.strip()
+    for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+# Si le site est derrière un proxy/serveur web qui gère le HTTPS et transmet l'en-tête
+# X-Forwarded-Proto (cas fréquent chez les hébergeurs), définir DJANGO_BEHIND_PROXY=True.
+# Sans cela, Django croit que la connexion est en http et peut boucler sur la redirection https.
+if os.environ.get("DJANGO_BEHIND_PROXY", "False") == "True":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Renforcement de la sécurité automatique dès que DEBUG=False (production)
 if not DEBUG:
@@ -83,6 +98,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -161,9 +177,23 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+# Dossier où `python manage.py collectstatic` rassemble tous les fichiers statiques
+# (CSS de l'admin, CSS/JS/images du site). WhiteNoise les sert ensuite en production.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+try:  # évite l'avertissement de WhiteNoise tant que `collectstatic` n'a pas été lancé
+    STATIC_ROOT.mkdir(exist_ok=True)
+except OSError:
+    pass
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+# Les médias (logo, photos de profil, galerie) sont servis par Django lui-même.
+# Si ton serveur web (nginx/Apache) sert déjà /media/, mets DJANGO_SERVE_MEDIA=False.
+SERVE_MEDIA = os.environ.get("DJANGO_SERVE_MEDIA", "True") == "True"
 
 
 # Email

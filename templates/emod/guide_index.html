@@ -17,7 +17,7 @@
             <a href="{{ cat.get_absolute_url }}">{{ cat.title }}</a>
         {% endfor %}
     </aside>
-    <div class="content-area">
+    <div class="content-area" id="liste" data-live-region>
         <div class="card" style="margin-bottom:30px; background:#f3f6fb;">
             <h3 style="margin-top:0; color:var(--navy);">Qu'est-ce qu'EMOD ?</h3>
             <p style="margin-bottom:0;">
@@ -34,7 +34,7 @@
             <input type="search" name="q" value="{{ query }}" placeholder="Rechercher un guide EMOD (ex: installation, calibration...)">
             <button type="submit" class="btn" style="margin-top:0;">Rechercher</button>
             {% if query %}
-                <a href="{% url 'emod:index' %}" class="btn-outline" style="margin-top:0; padding:11px 20px;">Réinitialiser</a>
+                <a href="{% url 'emod:index' %}#liste" class="btn-outline" style="margin-top:0; padding:11px 20px;">Réinitialiser</a>
             {% endif %}
         </form>
 

@@ -1,4 +1,12 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
+
+
+def validate_photo_size(f):
+    """Photo de profil : 2 Mo maximum (comme indiqué dans le formulaire participant)."""
+    if f and f.size > 2 * 1024 * 1024:
+        raise ValidationError("La photo ne doit pas dépasser 2 Mo.")
 
 
 class SiteSettings(models.Model):
@@ -189,23 +197,63 @@ class TeamMember(models.Model):
     CATEGORY_ENSEIGNANT = "enseignant"
     CATEGORY_ETUDIANT = "etudiant"
     CATEGORY_PARTENAIRE = "partenaire"
+    CATEGORY_PARTICIPANT = "participant"
     CATEGORY_CHOICES = [
         (CATEGORY_COORDINATION, "Coordination"),
         (CATEGORY_ENSEIGNANT, "Enseignants-chercheurs"),
         (CATEGORY_ETUDIANT, "Étudiants & modélisateurs"),
         (CATEGORY_PARTENAIRE, "Partenaires associés"),
+        (CATEGORY_PARTICIPANT, "Participants"),
     ]
 
-    name = models.CharField(max_length=200)
+    # 1. Identité
+    first_name = models.CharField("Prénom", max_length=100, blank=True)
+    last_name = models.CharField("Nom", max_length=100, blank=True)
+    name = models.CharField(
+        "Nom d'affichage", max_length=200, blank=True,
+        help_text="Laisser vide pour utiliser « Prénom Nom ».",
+    )
     slug = models.SlugField(unique=True, blank=True)
-    role = models.CharField(max_length=255, help_text="Ex: Enseignant-chercheur, Coordinateur du programme...")
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default=CATEGORY_ENSEIGNANT)
-    photo = models.ImageField(upload_to="team/", blank=True, null=True)
-    bio = models.TextField(blank=True)
-    order = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
+    role = models.CharField(
+        "Titre ou fonction", max_length=255,
+        help_text="Ex: Enseignant-chercheur, Chercheur scientifique...",
+    )
+    organization = models.CharField("Organisation ou entreprise", max_length=255, blank=True)
+    category = models.CharField("Catégorie", max_length=20, choices=CATEGORY_CHOICES, default=CATEGORY_ENSEIGNANT)
 
-    email = models.EmailField(blank=True)
+    cohort_year = models.PositiveSmallIntegerField(
+        "Promotion (année)", null=True, blank=True, db_index=True,
+        help_text="Ex: 2024, 2025, 2026. Permet de filtrer les participants par promotion.",
+    )
+
+    # 2. Coordonnées
+    phone = models.CharField("Téléphone", max_length=50, blank=True)
+    show_phone = models.BooleanField(
+        "Afficher le téléphone sur la page publique", default=False,
+        help_text="Décoché par défaut : le numéro reste visible seulement dans l'admin.",
+    )
+    country = models.CharField("Pays", max_length=100, blank=True)
+
+    # 3. Présentation
+    bio = models.TextField(
+        "Biographie courte", blank=True,
+        help_text="300 caractères maximum recommandés (3 à 4 lignes).",
+    )
+
+    # 5. Photo de profil
+    photo = models.ImageField(
+        "Photo de profil", upload_to="team/", blank=True, null=True,
+        validators=[FileExtensionValidator(["jpg", "jpeg", "png"]), validate_photo_size],
+        help_text="JPG ou PNG, 2 Mo maximum. Photo de face, bien éclairée, sur fond simple.",
+    )
+    order = models.PositiveIntegerField("Ordre d'affichage", default=0)
+    is_active = models.BooleanField("Visible sur le site", default=True)
+
+    # 2. Coordonnées / 4. Liens
+    email = models.EmailField("Adresse e-mail", blank=True)
+    website_url = models.URLField(blank=True, verbose_name="Site web")
+    youtube_url = models.URLField(blank=True, verbose_name="YouTube")
+    other_url = models.URLField(blank=True, verbose_name="Autre lien")
     facebook_url = models.URLField(blank=True, verbose_name="Facebook")
     twitter_url = models.URLField(blank=True, verbose_name="Twitter / X")
     linkedin_url = models.URLField(blank=True, verbose_name="LinkedIn")
@@ -221,13 +269,21 @@ class TeamMember(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
+
+    def clean(self):
+        if not (self.name or self.full_name):
+            raise ValidationError("Renseignez le prénom et le nom, ou le nom d'affichage.")
+
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse("core:team_detail", kwargs={"slug": self.slug})
 
     @property
     def initials(self):
-        parts = self.name.split()
+        parts = (self.name or self.full_name).split()
         return "".join(p[0].upper() for p in parts[:2]) if parts else "?"
 
     @property
@@ -239,6 +295,12 @@ class TeamMember(models.Model):
             links.append(("Twitter / X", self.twitter_url, "twitter"))
         if self.linkedin_url:
             links.append(("LinkedIn", self.linkedin_url, "linkedin"))
+        if self.youtube_url:
+            links.append(("YouTube", self.youtube_url, "youtube"))
+        if self.website_url:
+            links.append(("Site web", self.website_url, "other"))
+        if self.other_url:
+            links.append(("Autre lien", self.other_url, "other"))
         if self.scholar_url:
             links.append(("Google Scholar", self.scholar_url, "scholar"))
         if self.researchgate_url:
@@ -248,6 +310,16 @@ class TeamMember(models.Model):
         return links
 
     def save(self, *args, **kwargs):
+        if self.pk:
+            # Si le nom affiché avait été généré automatiquement (= « Prénom Nom ») et n'a pas été
+            # modifié à la main, il suit les corrections apportées au prénom / au nom.
+            old = TeamMember.objects.filter(pk=self.pk).values("first_name", "last_name", "name").first()
+            if old:
+                old_full = f"{old['first_name']} {old['last_name']}".strip()
+                if old["name"] == old_full and self.name == old["name"] and self.full_name != old_full:
+                    self.name = self.full_name
+        if not self.name:
+            self.name = self.full_name
         if not self.slug:
             from django.utils.text import slugify
             base_slug = slugify(self.name)

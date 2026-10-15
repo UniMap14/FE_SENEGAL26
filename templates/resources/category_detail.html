@@ -19,7 +19,7 @@
             <a href="{{ cat.get_absolute_url }}" class="{% if cat == category %}active{% endif %}">{{ cat.title }}</a>
         {% endfor %}
     </aside>
-    <div class="content-area">
+    <div class="content-area" id="liste" data-live-region>
         <h1>{{ category.title }}</h1>
         <div class="card-grid" style="padding:0;">
             {% for res in resources %}

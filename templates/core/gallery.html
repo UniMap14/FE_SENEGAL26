@@ -12,16 +12,16 @@
     </div>
 </section>
 
-<section class="page-with-sidebar" style="display:block;">
+<section class="page-with-sidebar" style="display:block;" id="liste" data-live-region>
     <div class="content-area" style="max-width: 1150px;">
 
         <div class="filter-tabs">
-            <a href="{% url 'core:gallery' %}" class="btn-outline{% if not active_category %} active{% endif %}">
+            <a href="{% url 'core:gallery' %}#liste" class="btn-outline{% if not active_category %} active{% endif %}">
                 Toutes les photos <span class="filter-count">{{ total_count }}</span>
             </a>
             {% for cat in categories %}
                 {% if cat.count %}
-                    <a href="{% url 'core:gallery' %}?categorie={{ cat.key }}" class="btn-outline{% if active_category == cat.key %} active{% endif %}">
+                    <a href="{% url 'core:gallery' %}?categorie={{ cat.key }}#liste" class="btn-outline{% if active_category == cat.key %} active{% endif %}">
                         {{ cat.label }} <span class="filter-count">{{ cat.count }}</span>
                     </a>
                 {% endif %}

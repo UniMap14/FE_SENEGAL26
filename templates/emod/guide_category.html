@@ -17,7 +17,7 @@
             <a href="{{ cat.get_absolute_url }}" class="{% if cat == category %}active{% endif %}">{{ cat.title }}</a>
         {% endfor %}
     </aside>
-    <div class="content-area">
+    <div class="content-area" id="liste" data-live-region>
         <p style="color:var(--text-muted); margin-top:0;">{{ category.guides.count }} guide{{ category.guides.count|pluralize }} dans cette catégorie</p>
         <div class="guide-list">
             {% for guide in guides %}

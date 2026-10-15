@@ -12,12 +12,12 @@
     </div>
 </section>
 
-<section style="padding: 50px 40px;">
+<section style="padding: 50px 40px;" id="liste" data-live-region>
 
     <div class="filter-tabs">
-        <a href="{% url 'news:index' %}" class="btn-outline{% if not active_category %} active{% endif %}">Toutes</a>
+        <a href="{% url 'news:index' %}#liste" class="btn-outline{% if not active_category %} active{% endif %}">Toutes</a>
         {% for key, label in categories %}
-            <a href="{% url 'news:index' %}?categorie={{ key }}" class="btn-outline{% if active_category == key %} active{% endif %}">{{ label }}</a>
+            <a href="{% url 'news:index' %}?categorie={{ key }}#liste" class="btn-outline{% if active_category == key %} active{% endif %}">{{ label }}</a>
         {% endfor %}
     </div>
 

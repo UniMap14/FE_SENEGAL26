@@ -19,7 +19,16 @@
             </div>
             <div class="profile-info">
                 <h1 style="margin-bottom:4px;">{{ member.name }}</h1>
-                <p style="color:var(--orange); font-weight:700; margin:0 0 16px;">{{ member.role }}</p>
+                <p style="color:var(--orange); font-weight:700; margin:0 0 6px;">{{ member.role }}</p>
+                {% if member.organization or member.country %}
+                    <p style="color:var(--text-muted); margin:0 0 16px;">
+                        {{ member.organization }}{% if member.organization and member.country %} · {% endif %}{{ member.country }}
+                    </p>
+                {% endif %}
+
+                {% if member.cohort_year %}
+                    <p style="margin:0 0 12px;"><span class="eyebrow-pill">Promotion {{ member.cohort_year }}</span></p>
+                {% endif %}
 
                 {% if member.bio %}
                     <div class="article-body">{{ member.bio|linebreaks }}</div>
@@ -27,6 +36,10 @@
 
                 {% if member.email %}
                     <p style="margin-top:10px;"><a href="mailto:{{ member.email }}" class="card-link">✉️ {{ member.email }}</a></p>
+                {% endif %}
+
+                {% if member.show_phone and member.phone %}
+                    <p style="margin-top:6px;"><a href="tel:{{ member.phone }}" class="card-link">📞 {{ member.phone }}</a></p>
                 {% endif %}
 
                 {% if member.social_links %}

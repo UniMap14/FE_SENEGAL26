@@ -21,7 +21,7 @@
         {% endfor %}
     </aside>
 
-    <div class="content-area">
+    <div class="content-area" id="liste" data-live-region>
         <form method="get" class="toolbar">
             <input type="search" name="q" value="{{ query }}" placeholder="Rechercher une ressource...">
             <select name="type">
@@ -38,7 +38,7 @@
             </select>
             <button type="submit" class="btn" style="margin-top:0;">Rechercher</button>
             {% if is_search %}
-                <a href="{% url 'resources:index' %}" class="btn-outline" style="margin-top:0; padding:11px 20px;">Réinitialiser</a>
+                <a href="{% url 'resources:index' %}#liste" class="btn-outline" style="margin-top:0; padding:11px 20px;">Réinitialiser</a>
             {% endif %}
         </form>
 

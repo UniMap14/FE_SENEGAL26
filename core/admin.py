@@ -48,8 +48,19 @@ class GalleryPhotoAdmin(admin.ModelAdmin):
 
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
-    list_display = ("name", "role", "category", "order", "is_active")
+    list_display = ("name", "role", "category", "cohort_year", "order", "is_active")
     list_editable = ("order", "is_active")
-    list_filter = ("category", "is_active")
-    search_fields = ("name", "role", "bio")
-    prepopulated_fields = {"slug": ("name",)}
+    list_filter = ("category", "cohort_year", "is_active")
+    search_fields = ("name", "first_name", "last_name", "role", "organization", "country", "bio")
+    readonly_fields = ("slug",)
+    fieldsets = (
+        ("1. Identité", {"fields": ("first_name", "last_name", "name", "role", "organization")}),
+        ("2. Coordonnées", {"fields": ("email", "phone", "show_phone", "country")}),
+        ("3. Présentation", {"fields": ("bio",)}),
+        ("4. Liens", {"fields": (
+            "website_url", "linkedin_url", "scholar_url", "orcid_url", "researchgate_url",
+            "youtube_url", "facebook_url", "twitter_url", "other_url",
+        )}),
+        ("5. Photo de profil", {"fields": ("photo",)}),
+        ("Affichage sur le site", {"fields": ("category", "cohort_year", "order", "is_active", "slug")}),
+    )

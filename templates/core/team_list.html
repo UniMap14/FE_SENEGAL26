@@ -11,15 +11,24 @@
     </div>
 </section>
 
-<section class="page-with-sidebar" style="display:block;">
+<section class="page-with-sidebar" style="display:block;" id="liste" data-live-region>
     <div class="content-area" style="max-width: 1150px;">
 
         <div class="filter-tabs">
-            <a href="{% url 'core:team_list' %}" class="btn-outline{% if not active_category %} active{% endif %}">Tous</a>
+            <a href="{% url 'core:team_list' %}{% if active_year %}?promotion={{ active_year }}{% endif %}#liste" class="btn-outline{% if not active_category %} active{% endif %}">Tous</a>
             {% for key, label in categories %}
-                <a href="{% url 'core:team_list' %}?categorie={{ key }}" class="btn-outline{% if active_category == key %} active{% endif %}">{{ label }}</a>
+                <a href="{% url 'core:team_list' %}?categorie={{ key }}{% if active_year %}&promotion={{ active_year }}{% endif %}#liste" class="btn-outline{% if active_category == key %} active{% endif %}">{{ label }}</a>
             {% endfor %}
         </div>
+
+        {% if years %}
+        <div class="filter-tabs">
+            <a href="{% url 'core:team_list' %}{% if active_category %}?categorie={{ active_category }}{% endif %}#liste" class="btn-outline{% if not active_year %} active{% endif %}">Toutes les promotions</a>
+            {% for y in years %}
+                <a href="{% url 'core:team_list' %}?promotion={{ y }}{% if active_category %}&categorie={{ active_category }}{% endif %}#liste" class="btn-outline{% if active_year == y|stringformat:'s' %} active{% endif %}">Promotion {{ y }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <div class="team-grid">
             {% for member in members %}
@@ -31,6 +40,8 @@
                     {% endif %}
                     <h3 class="team-card-name">{{ member.name }}</h3>
                     <p class="team-card-role">{{ member.role }}</p>
+                    {% if member.organization %}<p style="margin:2px 0 0; font-size:0.85rem; color:var(--text-muted);">{{ member.organization }}</p>{% endif %}
+                    {% if member.cohort_year %}<p style="margin:2px 0 0; font-size:0.8rem; color:var(--orange); font-weight:700;">Promotion {{ member.cohort_year }}</p>{% endif %}
                 </a>
             {% empty %}
                 <p>Aucun membre pour l'instant.</p>

@@ -21,7 +21,8 @@
                 {% if site_settings.tagline %}<span class="brand-tagline">{{ site_settings.tagline }}</span>{% endif %}
             </span>
         </a>
-        <nav class="main-nav">
+        <button type="button" class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="main-nav"><span></span><span></span><span></span></button>
+        <nav class="main-nav" id="main-nav">
             <a href="{% url 'core:home' %}"{% if request.resolver_match.url_name == 'home' %} class="active"{% endif %}>Maison</a>
             <a href="{% url 'core:about' %}"{% if request.resolver_match.url_name == 'about' %} class="active"{% endif %}>À propos de nous</a>
             <a href="{% url 'core:team_list' %}"{% if request.resolver_match.url_name == 'team_list' or request.resolver_match.url_name == 'team_detail' %} class="active"{% endif %}>Équipe</a>
@@ -129,5 +130,7 @@
     </footer>
 
     <script src="{% static 'js/hero-slider.js' %}"></script>
+    <script src="{% static 'js/smart-nav.js' %}"></script>
+    <script src="{% static 'js/nav-toggle.js' %}"></script>
 </body>
 </html>
